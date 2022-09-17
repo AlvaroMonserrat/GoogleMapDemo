@@ -3,17 +3,21 @@ package com.rrat.googlemapdemo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.*
 import com.rrat.googlemapdemo.ui.theme.GoogleMapDemoTheme
 
 class MapsComposeActivity : ComponentActivity() {
@@ -21,19 +25,40 @@ class MapsComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             GoogleMapDemoTheme {
-                val singapore = LatLng(1.35, 103.87)
-                val cameraPositionState = rememberCameraPositionState {
-                    position = CameraPosition.fromLatLngZoom(singapore, 10f)
+
+                var mapUiSettings by remember {
+                    mutableStateOf(
+                        MapUiSettings(
+                            zoomControlsEnabled = true
+                        )
+                    )
                 }
-                Box(Modifier.fillMaxSize()) {
-                    GoogleMap(cameraPositionState = cameraPositionState)
-                    Button(onClick = {
-                        // Move the camera to a new zoom level
-                        cameraPositionState.move(CameraUpdateFactory.zoomIn())
-                    }) {
-                        Text(text = "Zoom In")
+
+                val santiago = LatLng(-33.44925052284258, -70.66758645726445)
+                val cameraPositionState = rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(santiago, 10f)
+                }
+                Column(Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+                    Box(
+                        modifier = Modifier
+                            .height(300.dp)
+                            .width(300.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        GoogleMap(
+                            cameraPositionState = cameraPositionState,
+                            uiSettings = mapUiSettings
+                        ){
+                            Marker(
+                                state = MarkerState(position = santiago),
+                                title = "Marker in Santiago"
+                            )
+                        }
                     }
                 }
+
             }
         }
     }
