@@ -2,14 +2,19 @@ package com.rrat.googlemapdemo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.rrat.googlemapdemo.databinding.ActivityMapsBinding
+import kotlinx.coroutines.GlobalScope
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -40,16 +45,60 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
         val santiago = LatLng(-33.44925052284258, -70.66758645726445)
-        mMap.addMarker(MarkerOptions().position(santiago).title("Marker in Santiago"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(santiago, 10f))
 
-        mMap.uiSettings.isZoomControlsEnabled = true
-        mMap.uiSettings.isZoomGesturesEnabled = false
-        mMap.uiSettings.isScrollGesturesEnabled = false
-        mMap.uiSettings.isMyLocationButtonEnabled = true
+        //Add Camera
+        val cameraSantiago = CameraPosition.Builder()
+            .target(santiago)
+            .zoom(17f)
+            .bearing(0f)
+            .tilt(45f)
+            .build()
 
+        // Add a marker in Sydney and move the camera
+        mMap.addMarker(MarkerOptions().position(santiago))
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraSantiago))
+
+        //mMap.uiSettings.isZoomControlsEnabled = true
+       // mMap.uiSettings.isZoomGesturesEnabled = false
+       // mMap.uiSettings.isScrollGesturesEnabled = false
+
+        //setMapStyle()
         //mMap.setPadding(0, 0, 300, 0)
+    }
+
+    private fun setMapStyle() {
+        try {
+            /*val success = mMap.setMapStyle(
+                //MapStyleOptions.loadRawResourceStyle(this, R.raw.style)
+            )
+*/
+        }catch (e: Exception){
+
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.map_styles, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.normal_map ->{
+                mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+            }
+            R.id.hybrid_map ->{
+                mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+            }
+            R.id.satellite_map ->{
+                mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
+            }
+            R.id.terrain_map ->{
+                mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
+            }
+        }
+
+        return true
     }
 }
