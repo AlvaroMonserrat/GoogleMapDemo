@@ -13,11 +13,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import com.rrat.googlemapdemo.home.HomeScreen
 import com.rrat.googlemapdemo.ui.theme.GoogleMapDemoTheme
 
 class MapsComposeActivity : ComponentActivity() {
@@ -25,40 +27,7 @@ class MapsComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             GoogleMapDemoTheme {
-
-                var mapUiSettings by remember {
-                    mutableStateOf(
-                        MapUiSettings(
-                            zoomControlsEnabled = true
-                        )
-                    )
-                }
-
-                val santiago = LatLng(-33.44925052284258, -70.66758645726445)
-                val cameraPositionState = rememberCameraPositionState {
-                    position = CameraPosition.fromLatLngZoom(santiago, 10f)
-                }
-                Column(Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
-                    Box(
-                        modifier = Modifier
-                            .height(300.dp)
-                            .width(300.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        GoogleMap(
-                            cameraPositionState = cameraPositionState,
-                            uiSettings = mapUiSettings
-                        ){
-                            Marker(
-                                state = MarkerState(position = santiago),
-                                title = "Marker in Santiago"
-                            )
-                        }
-                    }
-                }
-
+                HomeScreen()
             }
         }
     }

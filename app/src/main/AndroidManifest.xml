@@ -14,10 +14,22 @@
         android:theme="@style/Theme.GoogleMapDemo"
         tools:targetApi="31">
         <activity
+            android:name=".basicmap.BasicActivity"
+            android:exported="false"
+            android:label="@string/title_activity_basic"
+            android:theme="@style/Theme.GoogleMapDemo" />
+
+        <activity
             android:name=".MapsComposeActivity"
             android:exported="true"
             android:label="@string/title_activity_maps_compose"
-            android:theme="@style/Theme.GoogleMapDemo" />
+            android:theme="@style/Theme.GoogleMapDemo">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -37,11 +49,7 @@
             android:name=".MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

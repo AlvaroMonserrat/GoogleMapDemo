@@ -1,22 +1,24 @@
 package com.rrat.googlemapdemo
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.rrat.googlemapdemo.databinding.ActivityMapsBinding
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -52,11 +54,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .target(santiago)
             .zoom(17f)
             .bearing(0f)
-            .tilt(45f)
+            .tilt(0f)
             .build()
 
+
         // Add a marker in Sydney and move the camera
-        mMap.addMarker(MarkerOptions().position(santiago))
+        val marker = mMap.addMarker(MarkerOptions()
+            .position(santiago)
+            .title("Santiago city")
+            .snippet("Some random text")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)))
+
+
+        if (marker != null) {
+            marker.tag = "Restaurant"
+        }
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraSantiago))
 
         //mMap.uiSettings.isZoomControlsEnabled = true
@@ -65,6 +77,66 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         //setMapStyle()
         //mMap.setPadding(0, 0, 300, 0)
+        //onMapClicked()
+        //onMapLongClicked()
+        //animationCoroutine()
+
+        mMap.setOnMarkerClickListener(this)
+        addPolyline()
+
+    }
+
+    private fun addPolyline(){
+        val polyline = mMap.addPolyline(
+            PolylineOptions().apply {
+                add(
+                LatLng(-33.44925052284258, -70.66758645726445),
+                LatLng(-33.45228771631465, -70.70164191202672)
+                )
+                width(5f)
+                color(Color.BLUE)
+                geodesic(true)
+            }
+        )
+
+    }
+
+    private fun animationCoroutine(){
+
+        val santiagoBounds = LatLngBounds(
+            LatLng(-33.6807085094817, -70.80290284886097),
+            LatLng(-33.23846951688101, -70.41700810809935)
+        )
+
+        lifecycleScope.launch {
+            delay(5000)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(santiagoBounds.center, 10f), 2000,
+                object: GoogleMap.CancelableCallback{
+                    override fun onCancel() {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onFinish() {
+                        TODO("Not yet implemented")
+                    }
+
+                }
+            )
+            mMap.setLatLngBoundsForCameraTarget(santiagoBounds)
+        }
+    }
+
+    private fun onMapClicked(){
+        mMap.setOnMapClickListener {
+            Toast.makeText(this, "Single Click map", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onMapLongClicked(){
+        mMap.setOnMapLongClickListener {
+            Toast.makeText(this, "Long Click map ${it.longitude} and ${it.latitude}", Toast.LENGTH_SHORT).show()
+            mMap.addMarker(MarkerOptions().position(it).title("new marker"))
+        }
     }
 
     private fun setMapStyle() {
@@ -99,6 +171,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        return true
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        Toast.makeText(this, "Marler ${marker.tag}", Toast.LENGTH_SHORT).show()
+        marker.showInfoWindow()
         return true
     }
 }
