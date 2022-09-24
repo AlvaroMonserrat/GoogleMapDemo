@@ -1,20 +1,23 @@
 package com.rrat.googlemapdemo
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.rrat.googlemapdemo.databinding.ActivityMapsBinding
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -22,6 +25,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    private val overlays by lazy { Overlays() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +76,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraSantiago))
 
-        //mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isZoomControlsEnabled = true
        // mMap.uiSettings.isZoomGesturesEnabled = false
        // mMap.uiSettings.isScrollGesturesEnabled = false
 
@@ -81,8 +86,51 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         //onMapLongClicked()
         //animationCoroutine()
 
-        mMap.setOnMarkerClickListener(this)
-        addPolyline()
+        //mMap.setOnMarkerClickListener(this)
+        //addPolyline()
+
+        //overlays.addGroundOverlay(mMap)
+
+        checkLocationPermission()
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun checkLocationPermission(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        == PackageManager.PERMISSION_GRANTED){
+            mMap.isMyLocationEnabled = true
+            Toast.makeText(this, "Already Enabled", Toast.LENGTH_SHORT).show()
+        }else{
+            requestPermission()
+        }
+    }
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+            1
+        )
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode != 1){
+            return
+        }
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this, "Granted!", Toast.LENGTH_SHORT).show()
+            mMap.isMyLocationEnabled = true
+        }else{
+            Toast.makeText(this, "We need your permission!", Toast.LENGTH_SHORT).show()
+
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
     }
 
